@@ -1,0 +1,161 @@
+1) {"appId":"MUH","reqId":2,"userId":"5b7e778faea86610b46ae575","userName":"guest"} // Receive app request 
+2) Send to queue of user 1)
+{
+	"dataId" : 150,
+	"data" : 
+			[
+				{
+					"id" : 1,
+					"name" : "Device 1"
+				 },
+				 {
+					"id" : 2,
+					"name" : "Device 2"
+				 },
+				 {
+					"id" : 3,
+					"name" : "Device 3"
+				 }
+				 
+			]
+ }
+ 
+3) Receive from WEB Interface
+ 
+Option 1
+ {
+	"dataId" : 151,
+	"data" : 
+			{
+				"id" : -1,
+				"name" : "All"
+			 }
+ }
+ 
+ Option 2
+   {
+	"dataId" : 151,
+	"data" : 
+			{
+				"id" : 1,
+				"name" : "Device 1"
+			 }
+ }
+ 
+ 4) Send Sensors
+ 
+  {
+	"dataId" : 152,
+	"data" : 
+			[
+				{
+					"id" : 1,
+					"name" : "Sensor 1"
+				}, 
+				{
+					"id" : 2,
+					"name" : "Sensor 2"
+				}
+			]
+ }
+ 
+ 5) Receive request
+ {
+	"dataId" : 153,
+	"data" :
+			{
+				"devices":
+				[
+					{
+						"id" : 1,
+						"name" : "Device 1"
+					 },
+					 {
+						"id" : 2,
+						"name" : "Device 2"
+					 },
+					 {
+						"id" : 3,
+						"name" : "Device 3"
+					 }	 
+				], 
+				"sensors":
+				[
+					{
+						"id" : 1,
+						"name" : "Sensor 1"
+					}, 
+					{
+						"id" : 2,
+						"name" : "Sensor 2"
+					}
+				], 
+				"timeStamps":
+				{
+					"start" : 123456, 
+					"end" : 123456
+				}
+					
+			}
+ }
+ 
+ 6) Send to RabbitMQ
+ 
+ { 
+	"dataId" : 154,
+	"data": {
+				"deviceArray":
+					[
+						{
+							"deviceId" :1,
+							"deviceData":
+							{
+								"timeStampArray":
+									[
+										{
+											"timeStamp":125468965,
+											"lat":55,
+											"lon":5,				
+											"sensorDataArray":
+											[	
+												{"id":1, "value":20},
+												{"id":2, "value":20},
+												{"id":3, "value":20},
+												{"id":4, "value":20},
+												{"id":5, "value":20}
+											]
+										}
+									]
+							}
+						}
+					]
+			}
+}
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

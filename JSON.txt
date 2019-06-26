@@ -1,0 +1,16 @@
+1) {"appId":"MUH","dataId":"0","reqId":2,"userId":"5b6d83f507396e14d0219e50","userName":"Guest"}
+2) {"dataId":151,"data":{"id" : 111,"name" : "Ship_1"}}
+3) {"dataId":153,"data":{"devices":[{"id" : 101,"name" : "Ship_1"},{"id" : 103,"name" : "Ship_3"}],"sensors":[{"id" : 1,"name" : "Sensor 1"},{"id" : 5,"name" : "Sensor 2"}],"timeStamps":{"start" : 1536926748892,"end" : 1537926788892}}}
+
+
+To write database:
+1) {"sourceId":1,"sourceName":"Test Ship 1","dataId": 1,"data":{"lat": 55,"lon": 5,"time": 1532598425,"cog":20,"sensorData":[{"id":1,"value":22.5,"unit":"deg","name": "temp"},{"id":2,"value":200,"unit":"","name": "NOX"},{"id":3,"value":34,"unit":"%","name": "PM2.5"},{"id":4,"value":50,"unit":"%","name": "PM10"}]}}
+2) {"sourceId":103,"sourceName":"Ship_3","dataId": 1,"data":{"lat": 55,"lon": 5,"time": 1532598333,"cog":20,"sensorData":[{"id":1,"value":22.3,"unit":"deg","name": "temp"},{"id":2,"value":203,"unit":"","name": "NOX"},{"id":3,"value":31,"unit":"%","name": "PM2.5"},{"id":4,"value":501,"unit":"%","name": "PM10"},{"id":5,"value":91,"unit":"%","name": "Pressure"},{"id":6,"value":41,"unit":"%","name": "Height"}]}}
+
+
+
+{"id":1,"value":22.1,"unit":"deg","name": "temp"},
+{"id":5,"value":91,"unit":"%","name": "Pressure"},
+{"id":2,"value":202,"unit":"","name": "NOX"},{"id":3,"value":32,"unit":"%","name": "PM2.5"},
+
+

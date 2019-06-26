@@ -1,0 +1,126 @@
+
+
+// Decoder inclusion in .pro file
+LIBS += -LC:/LIbDir/ThefolderWithLibFile -lAISDecoderLib
+INCLUDEPATH += "PathToHeaderFile"
+DEPENDPATH += "PathToHeaderFile"
+
+// Decoder Object 
+AISDecoderLib aisDecoder;
+
+// Decoder Connection 
+ connect(&aisDecoder,SIGNAL(signalDecodedAisMessage(QMap<QString,QString>)),this,SLOT(slotOnAisDecodedReceived(QMap<QString,QString>)));
+
+aisDecoder.onAISMessageReceived(aisString.toLocal8Bit());
+
+
+// Sample SLOT for decoded data 
+void ShipInfo::slotOnAisDecodedReceived(QMap<QString,QString> decodedAis){
+
+    ui->lbName->setText(decodedAis.value("name").trimmed());
+
+    QGeoCoordinate shipLocation = QGeoCoordinate(decodedAis.value("lat").toDouble(),decodedAis.value("lon").toDouble());
+    ui->lbLat->setText(UnitTool::GeoCoordinateToLatString(shipLocation));
+    ui->lbLon->setText(UnitTool::GeoCoordinateToLonString(shipLocation));
+
+    double hdg = decodedAis.value("hdg").toDouble();
+    double cog = decodedAis.value("cog").toDouble();
+
+    ui->lbHdg->setText(UnitTool::angleInDegToString(hdg));
+    ui->lbCog->setText(UnitTool::angleInDegToString(cog));
+
+    //ui->lbStw->setText(QString("%1 kn").arg(QString::number(decodedAis.value("stw").toDouble(),'f',1)));
+    ui->lbSog->setText(QString("%1 kn").arg(QString::number(decodedAis.value("sog").toDouble(),'f',1)));
+
+    QString eta = QString("%1/%2 %3:%4")
+            .arg(decodedAis.value("eta_day"))
+            .arg(decodedAis.value("eta_month"))
+            .arg(decodedAis.value("eta_hour"))
+            .arg(decodedAis.value("eta_min"));
+
+    ui->lbEtaAis->setText(eta);
+
+    ui->lbMmsi->setText(decodedAis.value("mmsi"));
+    //ui->lbRepeatInd->setText(decodedAis.value("repeatIndicator"));
+    ui->lbCallsign->setText(decodedAis.value("callsign"));
+    ui->lbImo->setText(decodedAis.value("imo"));
+    ui->lbToPort->setText(decodedAis.value("to_port"));
+    ui->lbToSb->setText(decodedAis.value("to_starboard"));
+    ui->lbToStern->setText(decodedAis.value("to_stern"));
+    ui->lbToBow->setText(decodedAis.value("to_bow"));
+
+    int loa = decodedAis.value("to_bow").toInt()+ decodedAis.value("to_stern").toInt();
+    int boa = decodedAis.value("to_port").toInt()+ decodedAis.value("to_starboard").toInt();
+
+    ui->lbBoa->setText(QString::number(boa));
+    ui->lbLoa->setText(QString::number(loa));
+    ui->lbDraught->setText(decodedAis.value("draught"));
+    ui->lbDestination->setText(decodedAis.value("destination"));
+
+    ui->lbNavStatus->setText(decodedAis.value("navStatusName"));
+    bool positionAccuracy =decodedAis.value("positionAccuracy").toInt();
+    if(positionAccuracy){
+        ui->lbPosAccuracy->setText("High (< 10 m)");
+    } else{
+        ui->lbPosAccuracy->setText("Low (> 10 m)");
+    }
+    bool raim =decodedAis.value("radioStatus").toInt();
+
+    if(raim){
+       ui->lbRaim->setText("RAIM In Use");
+    } else{
+        ui->lbRaim->setText("Not in use (default)");
+    }
+    ui->lbManInd->setText(decodedAis.value("man_indicatorName"));
+
+
+    ui->teTypeInfo->clear();
+    ui->teTypeInfo->setTextColor(QColor("#3498db"));
+    ui->teTypeInfo->append(decodedAis.value("shipTypeName"));
+    ui->teTypeInfo->append(decodedAis.value("shipTypeId"));
+    ui->lbMsgTypeName->setText(QString("(%1)%2").arg(decodedAis.value("message")).arg(decodedAis.value("messageName")));
+
+    QString aisTimeStampStr ="";
+    int aisTimeStamp =decodedAis.value("timestamp").toInt();
+    if(aisTimeStamp<60){
+         aisTimeStampStr =decodedAis.value("timestamp");
+    } else{
+        aisTimeStampStr = "invalid";
+    }
+
+
+
+     ui->lbTime->setText(QString("Last Received: %1(Local) Timestamp %2(UTC Sec)")
+                         .arg(QDateTime::currentDateTime().toString("dd MMM yyyy, hh:mm:ss"))
+                         .arg(aisTimeStampStr));
+
+    if(decodedAis.value("message").contains("8")||decodedAis.value("message").contains("6")){
+        QStringList msgContentList = decodedAis.value("rawAis").split(";");
+        for(int i=0;i<msgContentList.size();i++){
+            QString singleMessage = msgContentList.value(i);
+            ui->wgAisRouteMsg->setDataStr(singleMessage);
+        }
+
+       ui->wgAisInd->onAisRouteMessageReceived(decodedAis.value("message"));
+    }
+
+}
+
+//Decoder Test 
+
+//        aisDecoder.onAISMessageReceived(QByteArray("!AIVDM,2,1,9,B,53nFBv01SJ<thHp6220H4heHTf2222222222221?50:454o<`9QSlUDp,0*09"));
+//        aisDecoder.onAISMessageReceived(QByteArray("!AIVDM,2,2,9,B,888888888888880,2*2E"));
+//        aisDecoder.onAISMessageReceived(QByteArray("!AIVDM,1,1,,A,13AwPr00000pFa0P7InJL5JP2<0I,0*79"));
+//        aisDecoder.onAISMessageReceived(QByteArray("!AIVDM,1,1,,A,14eGKMhP00rkraHJPivPFwvL0<0<,0*23"));
+//        aisDecoder.onAISMessageReceived(QByteArray("!AIVDM,1,1,,B,13P:`4hP00OwbPRMN8p7ggvN0<0h,0*69"));
+//        aisDecoder.onAISMessageReceived(QByteArray("!AIVDM,1,1,,A,16:=?;0P00`SstvFnFbeGH6L088h,0*44"));
+//        aisDecoder.onAISMessageReceived(QByteArray("!AIVDM,1,1,,A,16`l:v8P0W8Vw>fDVB0t8OvJ0H;9,0*0A"));
+//        aisDecoder.onAISMessageReceived(QByteArray("!AIVDM,1,1,,A,169a:nP01g`hm4pB7:E0;@0L088i,0*5E"));
+//        aisDecoder.onAISMessageReceived(QByteArray("!AIVDM,1,1,,A,169F<h0P1S8hsm0B:H9o4gvN2@8o,0*5E"));
+//        aisDecoder.onAISMessageReceived(QByteArray("!AIVDM,1,1,,A,139f0`0P00PFDVvMag8a`gvP20T;,0*67"));
+//        aisDecoder.onAISMessageReceived(QByteArray("!AIVDM,1,1,,B,17u>=L001KR><?EfhW37iVFL05Ip,0*1D"));
+//        aisDecoder.onAISMessageReceived(QByteArray("!AIVDM,1,1,,A,16:>Pv002B8hjC6AjP9SCBNN05Ip,0*10"));
+//        aisDecoder.onAISMessageReceived(QByteArray("!AIVDM,1,1,,B,B6:io8@0=21k=`3C:eDJSww4SP00,0*68"));
+//        aisDecoder.onAISMessageReceived(QByteArray("!AIVDM,1,1,,B,6h2E3MDrDRiB0580@00000000000,0*04"));
+
+    // aisDecoder.onAISMessageReceived(QByteArray("!AIVDO,1,1,5,A,8>address@hidden:QQUP3en?wvlFR06EuOwgwl?wnSwe7wvlOwwsAwwnSGmwvh0,0*16"));
